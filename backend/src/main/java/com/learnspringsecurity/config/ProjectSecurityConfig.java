@@ -2,6 +2,7 @@ package com.learnspringsecurity.config;
 
 
 import com.learnspringsecurity.filter.CsrfCookieFilter;
+import com.learnspringsecurity.filter.RequestValidationBeforeFilter;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -50,6 +51,7 @@ public class ProjectSecurityConfig {
                 .csrf((csrf)->csrf.csrfTokenRequestHandler(requestAttributeHandler).ignoringRequestMatchers("/contact","/register")
                         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))//It will generate csrf token
                         .addFilterAfter(new CsrfCookieFilter(),BasicAuthenticationFilter.class)//CsrfCookieFilter will add csrf token to response header after basic authentication completed.
+                        .addFilterBefore(new RequestValidationBeforeFilter(),BasicAuthenticationFilter.class)
                 .authorizeHttpRequests()
 //                .requestMatchers("/account").hasAuthority("VIEWACCOUNT")
 //                .requestMatchers("/balance").hasAnyAuthority("VIEWACCOUNT","VIEWBALANCE")
