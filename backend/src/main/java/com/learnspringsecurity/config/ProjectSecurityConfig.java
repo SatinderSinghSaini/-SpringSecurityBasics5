@@ -53,6 +53,7 @@ public class ProjectSecurityConfig {
                 .csrf((csrf)->csrf.csrfTokenRequestHandler(requestAttributeHandler).ignoringRequestMatchers("/contact","/register")
                         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))//It will generate csrf token
                         .addFilterBefore(new RequestValidationBeforeFilter(),BasicAuthenticationFilter.class)
+                        .addFilterAt(new AuthenticationLoggingAtFilter(),BasicAuthenticationFilter.class)
                         .addFilterAfter(new CsrfCookieFilter(),BasicAuthenticationFilter.class)//CsrfCookieFilter will add csrf token to response header after basic authentication completed.
                         .addFilterAfter(new AuthoritiesLoggingAfterFilter(),BasicAuthenticationFilter.class)
                 .authorizeHttpRequests()
