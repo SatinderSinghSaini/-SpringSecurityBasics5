@@ -13,7 +13,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
-
+//This filter will throw bad request if username contains "test".
+//This will execute before BasicAuthentication as configured in ProjectSecurityConfig.
 public class RequestValidationBeforeFilter implements Filter {
     public static final String AUTHENTICATION_SCHEME_BASIC = "Basic";
     private Charset credentialsCharset = StandardCharsets.UTF_8;
