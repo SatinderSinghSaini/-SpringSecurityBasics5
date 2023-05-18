@@ -1,10 +1,7 @@
 package com.learnspringsecurity.config;
 
 
-import com.learnspringsecurity.filter.AuthenticationLoggingAtFilter;
-import com.learnspringsecurity.filter.AuthoritiesLoggingAfterFilter;
-import com.learnspringsecurity.filter.CsrfCookieFilter;
-import com.learnspringsecurity.filter.RequestValidationBeforeFilter;
+import com.learnspringsecurity.filter.*;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -26,6 +23,8 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 
 import javax.sql.DataSource;
+import java.lang.reflect.Array;
+import java.util.Arrays;
 import java.util.Collections;
 
 @Configuration
@@ -36,8 +35,7 @@ public class ProjectSecurityConfig {
         CsrfTokenRequestAttributeHandler requestAttributeHandler = new CsrfTokenRequestAttributeHandler();
         requestAttributeHandler.setCsrfRequestAttributeName("_csrf");
 
-        http.securityContext().requireExplicitSave(false).
-                and().sessionManagement((session)->session.sessionCreationPolicy(SessionCreationPolicy.ALWAYS)) //It tells springsecurity to create JssesionId while initial login using session management and send it back to UI application
+        http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and() //This configuration is required for creating JWT token
                 .cors().configurationSource(new CorsConfigurationSource() {
                     @Override
                     public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
@@ -46,6 +44,7 @@ public class ProjectSecurityConfig {
                         corsConfiguration.setAllowedMethods(Collections.singletonList("*"));
                         corsConfiguration.setAllowedHeaders(Collections.singletonList("*"));
                         corsConfiguration.setAllowCredentials(true);
+                        corsConfiguration.setExposedHeaders(Arrays.asList("Authorization"));    //header name of jwt token
                         corsConfiguration.setMaxAge(3600L);
                         return corsConfiguration;
                     }
@@ -56,6 +55,8 @@ public class ProjectSecurityConfig {
                         .addFilterAt(new AuthenticationLoggingAtFilter(),BasicAuthenticationFilter.class)
                         .addFilterAfter(new CsrfCookieFilter(),BasicAuthenticationFilter.class)//CsrfCookieFilter will add csrf token to response header after basic authentication completed.
                         .addFilterAfter(new AuthoritiesLoggingAfterFilter(),BasicAuthenticationFilter.class)
+                        .addFilterAfter(new JWTTokenGeneratorFilter(),BasicAuthenticationFilter.class)
+                        .addFilterBefore(new JWTTokenValidatorFilter(),BasicAuthenticationFilter.class)
                 .authorizeHttpRequests()
                 //Configuring Roles and removed authorities
                 //In Database, save roles with prefix ROLE as a spring standard. For e.g: ROLE_USER, ROLE_ADMIN
