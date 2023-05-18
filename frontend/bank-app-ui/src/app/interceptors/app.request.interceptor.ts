@@ -20,11 +20,17 @@ export class XhrInterceptor implements HttpInterceptor {
     if (sessionStorage.getItem("userdetails")) {
       this.user = JSON.parse(sessionStorage.getItem("userdetails")!);
     }
+    //Basic Authorization header for login request, Jwt Token for rest of the requests.
     if (this.user && this.user.password && this.user.email) {
       httpHeaders = httpHeaders.append(
         "Authorization",
         "Basic " + window.btoa(this.user.email + ":" + this.user.password)
       );
+    } else {
+      const authorization = window.localStorage.getItem("Authorization");
+      if (authorization) {
+        httpHeaders = httpHeaders.append("Authorization", authorization);
+      }
     }
     const xsrf = window.sessionStorage.getItem("XSRF-TOKEN");
     if (xsrf) {

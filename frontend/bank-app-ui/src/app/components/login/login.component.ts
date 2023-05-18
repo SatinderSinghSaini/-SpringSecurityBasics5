@@ -22,6 +22,10 @@ export class LoginComponent implements OnInit {
     this.loginService
       .validateLoginDetails(this.model)
       .subscribe((responseData) => {
+        const authorization = responseData.headers.get("Authorization");
+        if (authorization) {
+          window.localStorage.setItem("Authorization", authorization);
+        }
         this.model = <any>responseData.body;
         this.model.authStatus = "AUTH";
         //In backend project, csrf cookie related info is available in CookieCsrfTokenRepository.class
