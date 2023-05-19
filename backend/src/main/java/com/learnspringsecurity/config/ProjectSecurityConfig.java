@@ -58,8 +58,6 @@ public class ProjectSecurityConfig {
                         .addFilterAfter(new JWTTokenGeneratorFilter(),BasicAuthenticationFilter.class)
                         .addFilterBefore(new JWTTokenValidatorFilter(),BasicAuthenticationFilter.class)
                 .authorizeHttpRequests()
-                //Configuring Roles and removed authorities
-                //In Database, save roles with prefix ROLE as a spring standard. For e.g: ROLE_USER, ROLE_ADMIN
                 .requestMatchers("/account").hasRole("USER")
                 .requestMatchers("/balance").hasAnyRole("USER","ADMIN")
                 .requestMatchers("/cards").hasRole("USER")
